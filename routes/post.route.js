@@ -12,6 +12,7 @@ const router = express.Router()
 
 router.post('/create', uploadMiddleware.single('image'), create)
 router.get('/getposts', getposts)
+
 router.delete('/deletepost/:postId/:userId', authenticateJWT, deletepost)
 router.put('/updatepost/:postId', authenticateJWT, updatepost)
 
