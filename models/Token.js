@@ -24,7 +24,6 @@ const TokenSchema = new mongoose.Schema({
   expiresAt: {
     type: Date,
     required: true,
-    // index: true
   },
   
   // When the token was created

@@ -11,10 +11,53 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerOptions from './swaggerOptions.js';
 import cors from 'cors';
 
+import multer from 'multer';
+import path from 'path';  // Use 'import' instead of 'require'
+
+dotenv.config()
+
+
+
+
+
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+
+// // Endpoint to upload an image to Cloudinary
+// app.post('/upload', upload.single('image'), (req, res) => {
+//     const file = req.file;
+    
+//     if (!file) {
+//       return res.status(400).send('No file uploaded.');
+//     }
+  
+//     // Upload the image to Cloudinary
+//     cloudinaryV2.uploader.upload_stream(
+//       { resource_type: 'auto' }, // Automatically detects the file type
+//       (error, result) => {
+//         if (error) {
+//           return res.status(500).send(error);
+//         }
+  
+//         // Respond with the uploaded image URL
+//         res.json({
+//           message: 'File uploaded successfully!',
+//           url: result.secure_url, // URL of the uploaded image
+//         });
+//       }
+//     ).end(file.buffer);
+//   });
+
+
+
+
+
+
 // const apiRoutes = require('./routes/api');
 
 // import path from 'path'
-dotenv.config()
 
 mongoose.connect(process.env.MONGO)
 .then(()=>{

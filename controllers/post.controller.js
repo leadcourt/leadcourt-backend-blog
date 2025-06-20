@@ -1,29 +1,82 @@
 import Post from "../models/post.model.js";
 import { errorHandler } from "../utils/error.js";
 
+import cloudinary from 'cloudinary';
+import dotenv from 'dotenv'
+import multer from 'multer';
+import streamifier from 'streamifier';
+
+dotenv.config();
+
+
+
+const { v2: cloudinaryV2 } = cloudinary;  // Destructure to access cloudinary.v2
+
+
+// Cloudinary configuration
+cloudinaryV2.config({
+  cloud_name: process.env.CLOUDI_CLOUD_NAME,
+  api_key: process.env.CLOUDI_CLOUD_APIKEY,
+  api_secret: process.env.CLOUDI_CLOUD_APISECRET,
+});
+ 
 export const create = async (req, res, next) => {
   // if (!req.user.isAdmin) {
+    
   //   return next(errorHandler(403, "You are not allowed to create a post"));
   // }
+ 
 
-  console.log('req', req);
-  console.log('res', res);
+  const { title, content, category } = req.body;
+  const file = req.file; 
   
-  if (!req.body.title || !req.body.content) {
+  if (!file) {
+    return next(errorHandler(400, "Please upload an image"));
+  }
+
+  if (!title || !content) {
     return next(errorHandler(400, "Please provide all required fields"));
   }
-  const slug = req.body.title
+
+  console.log('\n\n\n\n\nreq\n', req.body);
+
+
+
+  const slug = title
     .split(" ")
     .join("-")
     .toLowerCase()
     .replace(/[^a-zA-Z0-9-]/g, "  -");
+    
+  console.log('slug', slug);
+
+  const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+
+  // console.log('base64Image', base64Image);
+
+
+  // `https://res.cloudinary.com/dizrwddzs/image/upload/post/img/${file.originalname}`, {
+
+  
+  const result = await cloudinaryV2.uploader.upload(base64Image, {
+        resource_type: 'image',
+        folder: 'posts',
+      }); 
+
 
   const newPost = new Post({
     ...req.body,
     slug,
     userId: 'LeadCourt',
-    // userId: req?.user?.id || 'LeadCourt',
+    // userId: console.log(req?.user?.id) || 'LeadCourt',
+    image: result.secure_url,
+
+    // imageUrl: result.secure_url,
   });
+
+  console.log('newPost', newPost);
+
+  
   try {
     const savedPost = await newPost.save();
     res.status(201).json(savedPost);
