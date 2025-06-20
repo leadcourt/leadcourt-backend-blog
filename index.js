@@ -77,7 +77,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 // app.use(cors());
-const allowedOrigins = ['http://localhost:3000', 'https://blog.leadcourt.com'];
+const allowedOrigins = ['http://localhost:5173', 'https://blog.leadcourt.com'];
 app.use(cors({
     origin: function(origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
