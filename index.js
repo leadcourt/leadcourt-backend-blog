@@ -75,7 +75,18 @@ const specs = swaggerJsdoc(swaggerOptions);
 const app = express()
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors());
+
+// app.use(cors());
+const allowedOrigins = ['http://localhost:3000', 'https://blog.leadcourt.com'];
+app.use(cors({
+    origin: function(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  }));
 
 // Routes
 // app.use('/api', apiRoutes);
