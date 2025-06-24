@@ -5,6 +5,7 @@ import userRoutes from './routes/user.route.js'
 import authRoutes from './routes/auth.route.js'
 import postRoutes from './routes/post.route.js'
 import commentRoutes from './routes/comment.route.js'
+import adminRoutes from './routes/admin.route.js'
 import cookieParser from 'cookie-parser'
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
@@ -81,6 +82,8 @@ const allowedOrigins = ['http://localhost:5173', 'https://blog.leadcourt.com'];
 app.use(cors({
     origin: function(origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
+        console.log('In the origin');
+        
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
@@ -95,6 +98,7 @@ app.use('/api/user', userRoutes)
 app.use('/api/auth', authRoutes)
 app.use('/api/post', postRoutes)
 app.use('/api/comment', commentRoutes)
+app.use('/api/admin', adminRoutes)
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 // app.use(express.static(path.join(__dirname, '/frontend/dist')))

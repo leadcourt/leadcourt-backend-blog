@@ -8,10 +8,12 @@ const commectSchema = new mongoose.Schema({
     postId:{
         type: String,
         required: true
-    },
-    userId:{
+    }, 
+    userName:{
         type: String,
-        required: true
+    },
+    userEmail:{
+        type: String,
     },
     likes:{
         type: Array,

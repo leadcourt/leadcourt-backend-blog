@@ -23,6 +23,7 @@ const authenticateJWT = async (req, res, next) => {
 
     const authHeader = req.headers.authorization;
     
+    
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ 
         success: false,
@@ -37,9 +38,14 @@ const authenticateJWT = async (req, res, next) => {
     
     if (savedToken) {
       console.log('Token found in database, skipping Firebase verification');
+      console.log('savedToken', savedToken);
       
       // Token exists in database, attach user info to request
-      req.user = { uid: savedToken.uid };
+        req.user = { 
+          uid: savedToken.uid, 
+          name: savedToken.uname,
+          role: savedToken.role 
+        };
       return next();
     }
     
@@ -61,20 +67,22 @@ const authenticateJWT = async (req, res, next) => {
       
       await Token.createToken(
         decodedToken.uid,
+        decodedToken.name,
+        decodedToken?.role || 'user',
         token,
         expirationTime
       );
-      
+       
       // Attach user info to request
-      req.user = { 
-        uid: decodedToken.uid,
-        email: decodedToken.email || null,
-        emailVerified: decodedToken.email_verified || false
+      req.user = {  
+        uid: decodedToken.uid, 
+        name: decodedToken.name,
+        role: decodedToken?.role || 'user'
       };
       
       next();
     } catch (firebaseError) {
-      console.error('Firebase token verification failed:', firebaseError);
+      console.error('Token verification failed:', firebaseError);
       return res.status(401).json({ 
         success: false,
         message: 'Invalid token. Authentication failed.'
@@ -96,9 +104,12 @@ const authenticateJWT = async (req, res, next) => {
  * @returns {Function} - Middleware function
  */
 const authorizeRoles = (roles = []) => {
+  
   return async (req, res, next) => {
+    
     try {
       // Must be used after authenticateJWT
+      
       if (!req.user || !req.user.uid) {
         return res.status(401).json({ 
           success: false,
@@ -110,7 +121,10 @@ const authorizeRoles = (roles = []) => {
       const userRecord = await auth.getUser(req.user.uid);
       const customClaims = userRecord.customClaims || {};
       const userRole = customClaims.role || 'user';
+
+      console.log(userRole);
       
+        
       // Check if user's role is in the allowed roles
       if (roles.length > 0 && !roles.includes(userRole)) {
         return res.status(403).json({ 

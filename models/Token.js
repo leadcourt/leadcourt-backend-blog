@@ -10,7 +10,18 @@ const TokenSchema = new mongoose.Schema({
   uid: {
     type: String,
     required: true,
-    index: true
+    index: true,
+    unique: true
+  },
+  
+  // Token owner uname
+  uname: {
+    type: String,
+  },
+  
+  // Token owner role
+  role: {
+    type: String,
   },
   
   // JWT token (the actual token string)
@@ -53,9 +64,11 @@ TokenSchema.statics.findByTokenString = function(tokenStr) {
  * @param {Date} expiresAt - Token expiration date
  * @returns {Promise} - The created token document
  */
-TokenSchema.statics.createToken = function(uid, token, expiresAt) {
+TokenSchema.statics.createToken = function(uid, uname, role, token, expiresAt) {
   return this.create({
     uid,
+    uname,
+    role,
     token,
     expiresAt
   });
@@ -77,6 +90,4 @@ TokenSchema.statics.removeAllUserTokens = function(uid) {
 const Token = mongoose.model('Token', TokenSchema);
 
 // module.exports = Token;
-export default {
-  Token
-}
+export default Token;
