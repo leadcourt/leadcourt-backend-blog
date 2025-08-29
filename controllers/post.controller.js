@@ -21,11 +21,10 @@ cloudinaryV2.config({
 });
  
 export const create = async (req, res, next) => {
-  // if (!req.user.isAdmin) {
+  if (!req.user.isAdmin || !req.user.id) {
     
-  //   return next(errorHandler(403, "You are not allowed to create a post"));
-  // }
- 
+    return next(errorHandler(403, "You are not allowed to create a post"));
+  }
 
   const { title, content, category } = req.body;
   const file = req.file; 
@@ -38,18 +37,12 @@ export const create = async (req, res, next) => {
     return next(errorHandler(400, "Please provide all required fields"));
   }
 
-  console.log('\n\n\n\n\nreq\n', req.body);
-
-
-
   const slug = title
     .split(" ")
     .join("-")
     .toLowerCase()
     .replace(/[^a-zA-Z0-9-]/g, "  -");
     
-  console.log('slug', slug);
-
   const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
 
   // console.log('base64Image', base64Image);
@@ -128,7 +121,7 @@ export const getposts = async (req, res, next) => {
 };
 
 export const deletepost = async (req, res, next) => {
-  if(!req.user.isAdmin || req.user.id != req.params.userId){
+  if(!req.user.isAdmin || !req.user.id){
     return next(errorHandler(403, 'You are not allowed to delete this post'))
   }
   try {
@@ -139,11 +132,10 @@ export const deletepost = async (req, res, next) => {
   }
 }
 
-
 export const updatepost = async(req, res, next)=>{
-    // if(!req.user.isAdmin || req.user.id != req.params.userId){
-    //   return next(errorHandler(403, 'You are not allowed to update this post'))
-    // }
+    if(!req.user.isAdmin || !req.user.id){
+      return next(errorHandler(403, 'You are not allowed to update this post'))
+    }
   try {
     const updatedPost = await Post.findByIdAndUpdate(req.params.postId, {
       $set: {

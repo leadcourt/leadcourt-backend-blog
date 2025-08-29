@@ -18,6 +18,7 @@ import dotenv from 'dotenv';
  * 5. Attach user info to request object
  */
 const authenticateJWT = async (req, res, next) => {
+  const admin_access = process.env.ADMIN_ACCESS
   try {
     // Extract token from Authorization header
 
@@ -46,6 +47,11 @@ const authenticateJWT = async (req, res, next) => {
           name: savedToken.uname,
           role: savedToken.role 
         };
+
+        if (savedToken.uid === admin_access) {
+          req.user.isAdmin = true;
+        }
+
       return next();
     }
     
